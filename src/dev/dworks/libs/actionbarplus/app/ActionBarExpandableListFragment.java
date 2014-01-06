@@ -8,14 +8,13 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.ExpandableListAdapter;
 import android.widget.TextView;
 import dev.dworks.libs.actionbarplus.ActionBarFragment;
 import dev.dworks.libs.actionbarplus.R;
 
 public class ActionBarExpandableListFragment extends ActionBarFragment {
-	private ListAdapter mAdapter;
+	private ExpandableListAdapter mAdapter;
 	private CharSequence mEmptyText;
 	private View mEmptyView;
 	final private Handler mHandler = new Handler();
@@ -25,7 +24,7 @@ public class ActionBarExpandableListFragment extends ActionBarFragment {
 	final private AdapterView.OnItemClickListener mOnClickListener = new AdapterView.OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-			onListItemClick((ListView) parent, v, position, id);
+			onListItemClick((ExpandableListView) parent, v, position, id);
 		}
 	};
 	private View mProgressContainer;
@@ -80,7 +79,7 @@ public class ActionBarExpandableListFragment extends ActionBarFragment {
 		mListShown = true;
 		mList.setOnItemClickListener(mOnClickListener);
 		if (mAdapter != null) {
-			ListAdapter adapter = mAdapter;
+			ExpandableListAdapter adapter = mAdapter;
 			mAdapter = null;
 			setListAdapter(adapter);
 		} else {
@@ -95,11 +94,11 @@ public class ActionBarExpandableListFragment extends ActionBarFragment {
 		return mEmptyView;
 	}
 
-	public ListAdapter getListAdapter() {
+	public ExpandableListAdapter getListAdapter() {
 		return mAdapter;
 	}
 
-	public ListView getListView() {
+	public ExpandableListView getListView() {
 		ensureList();
 		return mList;
 	}
@@ -129,7 +128,7 @@ public class ActionBarExpandableListFragment extends ActionBarFragment {
 		super.onDestroyView();
 	}
 
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onListItemClick(ExpandableListView l, View v, int position, long id) {
 	}
 
 	@Override
@@ -162,7 +161,7 @@ public class ActionBarExpandableListFragment extends ActionBarFragment {
 		mLoadingView.setText(text);
 	}
 
-	public void setListAdapter(ListAdapter adapter) {
+	public void setListAdapter(ExpandableListAdapter adapter) {
 		boolean hadAdapter = mAdapter != null;
 		mAdapter = adapter;
 		if (mList != null) {
