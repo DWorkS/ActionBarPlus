@@ -1,4 +1,4 @@
-package dev.dworks.libs.actionbarplus.app;
+package dev.dworks.libs.actionbarplus.misc;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import dev.dworks.libs.actionbarplus.app.PreferenceFragment;
+
 public class PreferenceManagerCompat {
 
     private static final String TAG = PreferenceManagerCompat.class.getSimpleName();
@@ -23,7 +25,7 @@ public class PreferenceManagerCompat {
      * {@link android.preference.Preference} in the hierarchy rooted at this {@link android.preference.PreferenceScreen} is
      * clicked.
      */
-    interface OnPreferenceTreeClickListener {
+    public interface OnPreferenceTreeClickListener {
         /**
          * Called when a preference in the tree rooted at this
          * {@link android.preference.PreferenceScreen} has been clicked.
@@ -36,7 +38,7 @@ public class PreferenceManagerCompat {
         boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference);
     }
 
-    static PreferenceManager newInstance(Activity activity, int firstRequestCode) {
+    public static PreferenceManager newInstance(Activity activity, int firstRequestCode) {
         try {
             Constructor<PreferenceManager> c = PreferenceManager.class.getDeclaredConstructor(Activity.class, int.class);
             c.setAccessible(true);
@@ -50,7 +52,7 @@ public class PreferenceManagerCompat {
     /**
      * Sets the owning preference fragment
      */
-    static void setFragment(PreferenceManager manager, PreferenceFragment fragment) {
+    public static void setFragment(PreferenceManager manager, PreferenceFragment fragment) {
         // stub
     }
 
@@ -60,7 +62,7 @@ public class PreferenceManagerCompat {
      *
      * @param listener The callback to be invoked.
      */
-    static void setOnPreferenceTreeClickListener(PreferenceManager manager, final OnPreferenceTreeClickListener listener) {
+    public static void setOnPreferenceTreeClickListener(PreferenceManager manager, final OnPreferenceTreeClickListener listener) {
         try {
             Field onPreferenceTreeClickListener = PreferenceManager.class.getDeclaredField("mOnPreferenceTreeClickListener");
             onPreferenceTreeClickListener.setAccessible(true);
@@ -101,7 +103,7 @@ public class PreferenceManagerCompat {
      * @return The root hierarchy (if one was not provided, the new hierarchy's
      * root).
      */
-    static PreferenceScreen inflateFromIntent(PreferenceManager manager, Intent intent, PreferenceScreen screen) {
+    public static PreferenceScreen inflateFromIntent(PreferenceManager manager, Intent intent, PreferenceScreen screen) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("inflateFromIntent", Intent.class, PreferenceScreen.class);
             m.setAccessible(true);
@@ -124,7 +126,7 @@ public class PreferenceManagerCompat {
      * root).
      * @hide
      */
-    static PreferenceScreen inflateFromResource(PreferenceManager manager, Activity activity, int resId, PreferenceScreen screen) {
+    public static PreferenceScreen inflateFromResource(PreferenceManager manager, Activity activity, int resId, PreferenceScreen screen) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("inflateFromResource", Context.class, int.class, PreferenceScreen.class);
             m.setAccessible(true);
@@ -140,7 +142,7 @@ public class PreferenceManagerCompat {
      *
      * @return The {@link android.preference.PreferenceScreen} object that is at the root of the hierarchy.
      */
-    static PreferenceScreen getPreferenceScreen(PreferenceManager manager) {
+    public static PreferenceScreen getPreferenceScreen(PreferenceManager manager) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("getPreferenceScreen");
             m.setAccessible(true);
@@ -154,7 +156,7 @@ public class PreferenceManagerCompat {
     /**
      * Called by the {@link android.preference.PreferenceManager} to dispatch a subactivity result.
      */
-    static void dispatchActivityResult(PreferenceManager manager, int requestCode, int resultCode, Intent data) {
+    public static void dispatchActivityResult(PreferenceManager manager, int requestCode, int resultCode, Intent data) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("dispatchActivityResult", int.class, int.class, Intent.class);
             m.setAccessible(true);
@@ -168,7 +170,7 @@ public class PreferenceManagerCompat {
      * Called by the {@link android.preference.PreferenceManager} to dispatch the activity stop
      * event.
      */
-    static void dispatchActivityStop(PreferenceManager manager) {
+    public static void dispatchActivityStop(PreferenceManager manager) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("dispatchActivityStop");
             m.setAccessible(true);
@@ -182,7 +184,7 @@ public class PreferenceManagerCompat {
      * Called by the {@link android.preference.PreferenceManager} to dispatch the activity destroy
      * event.
      */
-    static void dispatchActivityDestroy(PreferenceManager manager) {
+    public static void dispatchActivityDestroy(PreferenceManager manager) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("dispatchActivityDestroy");
             m.setAccessible(true);
@@ -198,7 +200,7 @@ public class PreferenceManagerCompat {
      * @param preferenceScreen The root {@link android.preference.PreferenceScreen} of the preference hierarchy.
      * @return Whether the {@link android.preference.PreferenceScreen} given is different than the previous.
      */
-    static boolean setPreferences(PreferenceManager manager, PreferenceScreen screen) {
+    public static boolean setPreferences(PreferenceManager manager, PreferenceScreen screen) {
         try {
             Method m = PreferenceManager.class.getDeclaredMethod("setPreferences", PreferenceScreen.class);
             m.setAccessible(true);

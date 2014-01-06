@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import dev.dworks.libs.actionbarplus.ActionBarFragment;
 import dev.dworks.libs.actionbarplus.R;
+import dev.dworks.libs.actionbarplus.misc.PreferenceManagerCompat;
 
 public abstract class PreferenceFragment extends ActionBarFragment 
 	implements PreferenceManagerCompat.OnPreferenceTreeClickListener {

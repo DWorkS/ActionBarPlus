@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.dworks.libs.actionbarplus.app;
+package dev.dworks.libs.actionbarplus.widget;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,9 +31,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import dev.dworks.libs.actionbarplus.R;
-import dev.dworks.libs.actionbarplus.widget.FillerView;
-import dev.dworks.libs.actionbarplus.widget.HeaderLayout;
-import dev.dworks.libs.actionbarplus.widget.PinnedSectionGridView;
 import dev.dworks.libs.actionbarplus.widget.PinnedSectionGridView.PinnedSectionGridAdapter;
 
 public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSectionGridAdapter{

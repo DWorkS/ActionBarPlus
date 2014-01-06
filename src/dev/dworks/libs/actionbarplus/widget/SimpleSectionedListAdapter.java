@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.dworks.libs.actionbarplus.app;
+package dev.dworks.libs.actionbarplus.widget;
 
 import java.util.Arrays;
 import java.util.Comparator;
