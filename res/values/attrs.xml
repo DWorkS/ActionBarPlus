@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PanningView">
+        <attr name="panningDurationInMs" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="CircularImageView">
+        <attr name="border" format="boolean"></attr>
+        <attr name="border_width" format="integer"></attr>
+        <attr name="border_color" format="color"></attr>
+        <attr name="shadow" format="boolean"></attr>
+    </declare-styleable>
+    <declare-styleable name="Theme">
+        <attr name="circularImageViewStyle" format="reference"></attr>
+    </declare-styleable>
+    <declare-styleable name="PagerSlidingTabStrip">
+        <attr name="pstsIndicatorColor" format="color" />
+        <attr name="pstsUnderlineColor" format="color" />
+        <attr name="pstsDividerColor" format="color" />
+        <attr name="pstsIndicatorHeight" format="dimension" />
+        <attr name="pstsUnderlineHeight" format="dimension" />
+        <attr name="pstsDividerPadding" format="dimension" />
+        <attr name="pstsTabPaddingLeftRight" format="dimension" />
+        <attr name="pstsScrollOffset" format="dimension" />
+        <attr name="pstsTabBackground" format="reference" />
+        <attr name="pstsShouldExpand" format="boolean" />
+        <attr name="pstsTextAllCaps" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="ParallaxScrollView">
+        <attr name="parallexOffset" format="float" />
+    </declare-styleable>
+
+</resources>
