@@ -140,8 +140,7 @@ public class Utils {
     }
     
     public static boolean hasKitKat() {
-    	return false;
-//        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
     public static boolean hasMoreHeap(){
     	return Runtime.getRuntime().maxMemory() > 20971520;
