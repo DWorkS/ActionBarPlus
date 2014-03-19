@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.dworks.libs.actionbarplus.widget;
+package dev.dworks.libs.astickyheader;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -29,7 +29,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import dev.dworks.libs.actionbarplus.R;
 import dev.dworks.libs.actionbarplus.widget.PinnedSectionListView.PinnedSectionListAdapter;
 
 public class SimpleSectionedListAdapter extends BaseAdapter implements PinnedSectionListAdapter{
@@ -38,12 +37,12 @@ public class SimpleSectionedListAdapter extends BaseAdapter implements PinnedSec
     private LayoutInflater mLayoutInflater;
     private ListAdapter mBaseAdapter;
     private SparseArray<Section> mSections = new SparseArray<Section>();
+	private int mHeaderTextViewResId;
 
     public static class Section {
         int firstPosition;
         int sectionedPosition;
         CharSequence title;
-
         public Section(int firstPosition, CharSequence title) {
             this.firstPosition = firstPosition;
             this.title = title;
@@ -54,10 +53,10 @@ public class SimpleSectionedListAdapter extends BaseAdapter implements PinnedSec
         }
     }
 
-    public SimpleSectionedListAdapter(Context context, int sectionResourceId,
-            BaseAdapter baseAdapter) {
+    public SimpleSectionedListAdapter(Context context, BaseAdapter baseAdapter, int sectionResourceId, int headerTextViewResId) {
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
+        mHeaderTextViewResId = headerTextViewResId;
         mBaseAdapter = baseAdapter;
         mBaseAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -168,7 +167,7 @@ public class SimpleSectionedListAdapter extends BaseAdapter implements PinnedSec
 
     @Override
     public boolean areAllItemsEnabled() {
-        return false;
+    	return mBaseAdapter.areAllItemsEnabled();
     }
 
     @Override
@@ -189,11 +188,11 @@ public class SimpleSectionedListAdapter extends BaseAdapter implements PinnedSec
         		convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
         	}
         	else{
-        		if(null == convertView.findViewById(R.id.header)){
+        		if(null == convertView.findViewById(mHeaderTextViewResId)){
         			convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);	
         		}
         	}
-            view = (TextView) convertView.findViewById(R.id.header);
+            view = (TextView) convertView.findViewById(mHeaderTextViewResId);
             view.setText(mSections.get(position).title);
             return convertView;
 

@@ -29,11 +29,14 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import dev.dworks.libs.actionbarplus.R;
 import dev.dworks.libs.actionbarplus.misc.Utils.HorizontallyScrollable;
@@ -59,6 +62,12 @@ public class PhotoView extends ImageView implements OnGestureListener,
     /** The width & height of the bitmap returned by {@link #getCroppedPhoto()} */
     private final static float CROPPED_SIZE = 256.0f;
 
+    /**
+     * Touch slop used to determine if this double tap is valid for starting a scale or should be
+     * ignored.
+     */
+    private static int sTouchSlopSquare;
+
     /** If {@code true}, the static values have been initialized */
     private static boolean sInitialized;
 
@@ -79,7 +88,7 @@ public class PhotoView extends ImageView implements OnGestureListener,
     private static Paint sCropPaint;
 
     /** The photo to display */
-    private BitmapDrawable mDrawable;
+    private Drawable mDrawable;
     /** The matrix used for drawing; this may be {@code null} */
     private Matrix mDrawMatrix;
     /** A matrix to apply the scaling of the photo */
@@ -105,7 +114,7 @@ public class PhotoView extends ImageView implements OnGestureListener,
     /** Actual crop size; may differ from {@link #sCropSize} if the screen is smaller */
     private int mCropSize;
     /** The maximum amount of scaling to apply to images */
-    private float mMaxInitialScaleFactor;
+    private float mMaxInitialScaleFactor = 2;
 
     /** Gesture detector */
     private GestureDetectorCompat mGestureDetector;
@@ -154,6 +163,24 @@ public class PhotoView extends ImageView implements OnGestureListener,
     /** Array to store a copy of the matrix values */
     private float[] mValues = new float[9];
 
+    /**
+     * Track whether a double tap event occurred.
+     */
+    private boolean mDoubleTapOccurred;
+
+    /**
+     * X and Y coordinates for the current down event. Since mDoubleTapOccurred only contains the
+     * information that there was a double tap event, use these to get the secondary tap
+     * information to determine if a user has moved beyond touch slop.
+     */
+    private float mDownFocusX;
+    private float mDownFocusY;
+
+    /**
+     * Whether the QuickSale gesture is enabled.
+     */
+    private boolean mQuickScaleEnabled;
+
     public PhotoView(Context context) {
         super(context);
         initialize();
@@ -194,7 +221,48 @@ public class PhotoView extends ImageView implements OnGestureListener,
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        if (mDoubleTapToZoomEnabled && mTransformsEnabled) {
+        mDoubleTapOccurred = true;
+        if (!mQuickScaleEnabled) {
+            return scale(e);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        final int action = e.getAction();
+        boolean handled = false;
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                if (mQuickScaleEnabled) {
+                    mDownFocusX = e.getX();
+                    mDownFocusY = e.getY();
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (mQuickScaleEnabled) {
+                    handled = scale(e);
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mQuickScaleEnabled && mDoubleTapOccurred) {
+                    final int deltaX = (int) (e.getX() - mDownFocusX);
+                    final int deltaY = (int) (e.getY() - mDownFocusY);
+                    int distance = (deltaX * deltaX) + (deltaY * deltaY);
+                    if (distance > sTouchSlopSquare) {
+                        mDoubleTapOccurred = false;
+                    }
+                }
+                break;
+
+        }
+        return handled;
+    }
+
+    private boolean scale(MotionEvent e) {
+        boolean handled = false;
+        if (mDoubleTapToZoomEnabled && mTransformsEnabled && mDoubleTapOccurred) {
             if (!mDoubleTapDebounce) {
                 float currentScale = getScale();
                 float targetScale = currentScale * DOUBLE_TAP_SCALE_FACTOR;
@@ -204,15 +272,12 @@ public class PhotoView extends ImageView implements OnGestureListener,
                 targetScale = Math.min(mMaxScale, targetScale);
 
                 mScaleRunnable.start(currentScale, targetScale, e.getX(), e.getY());
+                handled = true;
             }
             mDoubleTapDebounce = false;
         }
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent e) {
-        return true;
+        mDoubleTapOccurred = false;
+        return handled;
     }
 
     @Override
@@ -379,6 +444,34 @@ public class PhotoView extends ImageView implements OnGestureListener,
         mRotateRunnable = null;
         setOnClickListener(null);
         mExternalClickListener = null;
+        mDoubleTapOccurred = false;
+    }
+
+    public void bindResource(int resourceId){
+    	bindDrawable(getResources().getDrawable(resourceId));	
+    }
+    
+    public void bindDrawable(Drawable drawable) {
+        boolean changed = false;
+        if (drawable != null && drawable != mDrawable) {
+            // Clear previous state.
+            if (mDrawable != null) {
+                mDrawable.setCallback(null);
+            }
+
+            mDrawable = drawable;
+
+            // Reset mMinScale to ensure the bounds / matrix are recalculated
+            mMinScale = 0f;
+
+            // Set a callback?
+            mDrawable.setCallback(this);
+
+            changed = true;
+        }
+
+        configureBounds(changed);
+        invalidate();
     }
 
     /**
@@ -387,9 +480,10 @@ public class PhotoView extends ImageView implements OnGestureListener,
      * @param photoBitmap the bitmap to bind.
      */
     public void bindPhoto(Bitmap photoBitmap) {
-        boolean changed = false;
-        if (mDrawable != null) {
-            final Bitmap drawableBitmap = mDrawable.getBitmap();
+        boolean currentDrawableIsBitmapDrawable = mDrawable instanceof BitmapDrawable;
+        boolean changed = !(currentDrawableIsBitmapDrawable);
+        if (mDrawable != null && currentDrawableIsBitmapDrawable) {
+            final Bitmap drawableBitmap = ((BitmapDrawable) mDrawable).getBitmap();
             if (photoBitmap == drawableBitmap) {
                 // setting the same bitmap; do nothing
                 return;
@@ -416,33 +510,18 @@ public class PhotoView extends ImageView implements OnGestureListener,
      * Returns the bound photo data if set. Otherwise, {@code null}.
      */
     public Bitmap getPhoto() {
-        if (mDrawable != null) {
-            return mDrawable.getBitmap();
+        if (mDrawable != null && mDrawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) mDrawable).getBitmap();
         }
         return null;
-    }
-    
-    public Drawable getSetDrawable() {
-        if (mDrawable != null) {
-            return mDrawable;
-        }
-        return null;
-    }
-    
-    public int getActualHeight(){
-        if (mDrawable != null) {
-            return mDrawable.getIntrinsicHeight();
-        }
-        return 0;
-    }
-    
-    public int getActualWidth(){
-        if (mDrawable != null) {
-            return mDrawable.getIntrinsicWidth();
-        }
-        return 0;
     }
 
+    /**
+     * Returns the bound drawable. May be {@code null} if no drawable is bound.
+     */
+    public Drawable getDrawable() {
+        return mDrawable;
+    }
 
     /**
      * Gets video data associated with this item. Returns {@code null} if this is not a video.
@@ -536,7 +615,6 @@ public class PhotoView extends ImageView implements OnGestureListener,
     public void resetTransformations() {
         // snap transformations; we don't animate
         mMatrix.set(mOriginalMatrix);
-
         // Invalidate the view because if you move off this PhotoView
         // to another one and come back, you want it to draw from scratch
         // in case you were zoomed in or translated (since those settings
@@ -557,6 +635,32 @@ public class PhotoView extends ImageView implements OnGestureListener,
     public void rotateCounterClockwise() {
         rotate(-90, true);
     }
+    
+    /**
+     * Rotates the image 90 degrees, counter clockwise.
+     */
+    public void rotateTo(float degree) {
+        rotate(degree % 360, true);
+    }
+    
+    /**
+     * Rotates the image 90 degrees, counter clockwise.
+     */
+    public void rotateTo(float degree, boolean animate) {
+        rotate(degree % 360, animate);
+    }
+    
+    /**
+     * Get Rotation of the image.
+     */
+    public float getRotation() {
+        return mRotation % 360;
+    }
+    
+    public void setRotation(float degree) {
+        mRotation = degree % 360;
+    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -636,6 +740,25 @@ public class PhotoView extends ImageView implements OnGestureListener,
         }
     }
 
+    @Override
+    public boolean verifyDrawable(Drawable drawable) {
+        return mDrawable == drawable || super.verifyDrawable(drawable);
+    }
+
+    @Override
+    /**
+     * {@inheritDoc}
+     */
+    public void invalidateDrawable(Drawable drawable) {
+        // Only invalidate this view if the passed in drawable is displayed within this view. If
+        // another drawable is passed in, have the parent view handle invalidation.
+        if (mDrawable == drawable) {
+            invalidate();
+        } else {
+            super.invalidateDrawable(drawable);
+        }
+    }
+
     /**
      * Forces a fixed height for this view.
      *
@@ -661,7 +784,7 @@ public class PhotoView extends ImageView implements OnGestureListener,
             resetTransformations();
         }
     }
-
+    
     /**
      * Configures the bounds of the photo. The photo will always be scaled to fit center.
      */
@@ -761,8 +884,20 @@ public class PhotoView extends ImageView implements OnGestureListener,
      * NOTE: This method overwrites any values stored in {@link #mValues}.
      */
     private float getScale() {
-        mMatrix.getValues(mValues);
-        return mValues[Matrix.MSCALE_X];
+        return FloatMath.sqrt((float) Math.pow(getValue(mMatrix, Matrix.MSCALE_X), 2) + (float) Math.pow(getValue(mMatrix, Matrix.MSKEW_Y), 2));
+    }
+    
+
+    /**
+     * Helper method that 'unpacks' a Matrix and returns the required value
+     *
+     * @param matrix     - Matrix to unpack
+     * @param whichValue - Which value from Matrix.M* to return
+     * @return float - returned value
+     */
+    private float getValue(Matrix matrix, int whichValue) {
+        matrix.getValues(mValues);
+        return mValues[whichValue];
     }
 
     /**
@@ -955,10 +1090,15 @@ public class PhotoView extends ImageView implements OnGestureListener,
             sCropPaint.setColor(resources.getColor(R.color.photo_crop_highlight_color));
             sCropPaint.setStyle(Style.STROKE);
             sCropPaint.setStrokeWidth(resources.getDimension(R.dimen.photo_crop_stroke_width));
+
+            final ViewConfiguration configuration = ViewConfiguration.get(context);
+            final int touchSlop = configuration.getScaledTouchSlop();
+            sTouchSlopSquare = touchSlop * touchSlop;
         }
 
         mGestureDetector = new GestureDetectorCompat(context, this, null);
         mScaleGetureDetector = new ScaleGestureDetector(context, this);
+        mQuickScaleEnabled = ScaleGestureDetectorCompat.isQuickScaleEnabled(mScaleGetureDetector);
         mScaleRunnable = new ScaleRunnable(this);
         mTranslateRunnable = new TranslateRunnable(this);
         mSnapRunnable = new SnapRunnable(this);
@@ -1312,5 +1452,19 @@ public class PhotoView extends ImageView implements OnGestureListener,
 
     public void setMaxInitialScale(float f) {
         mMaxInitialScaleFactor = f;
+    }
+
+    public int getActualHeight(){
+        if (mDrawable != null) {
+            return mDrawable.getIntrinsicHeight();
+        }
+        return 0;
+    }
+    
+    public int getActualWidth(){
+        if (mDrawable != null) {
+            return mDrawable.getIntrinsicWidth();
+        }
+        return 0;
     }
 }

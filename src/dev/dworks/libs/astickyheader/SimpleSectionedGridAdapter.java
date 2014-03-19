@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.dworks.libs.actionbarplus.widget;
+package dev.dworks.libs.astickyheader;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,7 +30,9 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import dev.dworks.libs.actionbarplus.R;
+import dev.dworks.libs.actionbarplus.widget.FillerView;
+import dev.dworks.libs.actionbarplus.widget.HeaderLayout;
+import dev.dworks.libs.actionbarplus.widget.PinnedSectionGridView;
 import dev.dworks.libs.actionbarplus.widget.PinnedSectionGridView.PinnedSectionGridAdapter;
 
 public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSectionGridAdapter{
@@ -53,6 +55,8 @@ public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSec
 	private int requestedColumnWidth;
 	private int requestedHorizontalSpacing;
 	private GridView mGridView;
+	private int mHeaderLayoutResId;
+	private int mHeaderTextViewResId;
 
     public static class Section {
         int firstPosition;
@@ -70,9 +74,12 @@ public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSec
         }
     }
 
-    public SimpleSectionedGridAdapter(Context context, int sectionResourceId, BaseAdapter baseAdapter) {
+    public SimpleSectionedGridAdapter(Context context, BaseAdapter baseAdapter, int sectionResourceId, int headerLayoutResId,
+			int headerTextViewResId) {
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
+		mHeaderLayoutResId = headerLayoutResId;
+		mHeaderTextViewResId = headerTextViewResId;
         mBaseAdapter = baseAdapter;
         mContext = context;
         mBaseAdapter.registerDataSetObserver(new DataSetObserver() {
@@ -265,7 +272,7 @@ public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSec
 
     @Override
     public boolean areAllItemsEnabled() {
-        return false;
+    	return mBaseAdapter.areAllItemsEnabled();
     }
 
     @Override
@@ -281,33 +288,30 @@ public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSec
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (isSectionHeaderPosition(position)) {
-        	HeaderLayout header;
-        	TextView view;
-        	if(null == convertView){
-        		convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
-        	}
-        	else{
-        		if(null == convertView.findViewById(R.id.header_layout)){
-        			convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);	
-        		}
-        	}
+			HeaderLayout header;
+			TextView view;
+			if (null == convertView) {
+				convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
+			} else {
+				if (null == convertView.findViewById(mHeaderLayoutResId)) {
+					convertView = mLayoutInflater.inflate(mSectionResourceId, parent, false);
+				}
+			}
 			switch (mSections.get(position).type) {
 			case TYPE_HEADER:
-				header = (HeaderLayout) convertView.findViewById(R.id.header_layout);
-				view = (TextView) convertView.findViewById(R.id.header);
-	            view.setText(mSections.get(position).title);
-	            header.setHeaderWidth(getHeaderSize());
-	            //view.setBackgroundColor(Color.BLUE);
-	            break;
+				header = (HeaderLayout) convertView.findViewById(mHeaderLayoutResId);
+				view = (TextView) convertView.findViewById(mHeaderTextViewResId);
+				view.setText(mSections.get(position).title);
+				header.setHeaderWidth(getHeaderSize());
+				break;
 			case TYPE_HEADER_FILLER:
-				header = (HeaderLayout) convertView.findViewById(R.id.header_layout);
-				view = (TextView) convertView.findViewById(R.id.header);
-	            view.setText("");
-	            header.setHeaderWidth(0);
+				header = (HeaderLayout) convertView.findViewById(mHeaderLayoutResId);
+				view = (TextView) convertView.findViewById(mHeaderTextViewResId);
+				view.setText("");
+				header.setHeaderWidth(0);
 				break;
 			default:
-				convertView = getFillerView(convertView, parent, mLastViewSeen);
-				break;
+				convertView = getFillerView(mLastViewSeen);
 			}
         } else {
             convertView = mBaseAdapter.getView(sectionedPositionToPosition(position), convertView, parent);
@@ -316,19 +320,21 @@ public class SimpleSectionedGridAdapter extends BaseAdapter implements PinnedSec
         return convertView;
     }
     
-    private FillerView getFillerView(View convertView, ViewGroup parent, View lastViewSeen) {
-        FillerView fillerView = null;
-        if (fillerView == null) {
-            fillerView = new FillerView(mContext);
-        }
-        fillerView.setMeasureTarget(lastViewSeen);
-        return fillerView;
-    }
+	private FillerView getFillerView(final View lastViewSeen) {
+		final FillerView fillerView = new FillerView(mContext);
+		fillerView.setMeasureTarget(lastViewSeen);
+		return fillerView;
+	}
 
 	@Override
 	public boolean isItemViewTypePinned(int position) {
 		Section section = mSections.get(position); 
 		return isSectionHeaderPosition(position) && section.type == TYPE_HEADER;
+	}
+
+	@Override
+	public int getHeaderLayoutResId() {
+		return mHeaderLayoutResId;
 	}
 
 	public static class ViewHolder {
