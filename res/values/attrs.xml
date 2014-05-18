@@ -13,10 +13,11 @@
     <declare-styleable name="Theme">
         <attr name="circularImageViewStyle" format="reference"></attr>
     </declare-styleable>
+    <attr name="textSize" format="dimension" />
     <declare-styleable name="FloatLabelEditText">
         <attr name="hint" format="string"/>
         <attr name="text" format="string"/>
-        <attr name="textSize" format="dimension"/>
+        <attr name="textSize"/>
         <attr name="textColorHintFocused" format="color"/>
         <attr name="textColorHintUnFocused" format="color"/>
         <attr name="fitScreenWidth" format="enum">

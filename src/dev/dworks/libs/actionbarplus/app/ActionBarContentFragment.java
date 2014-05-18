@@ -26,7 +26,8 @@ public class ActionBarContentFragment extends ActionBarFragment {
         }
     };
     private TextView mStandardEmptyView;
-
+    private View mContentView;
+    
     private void ensureContent() {
         if (mContent != null) {
             return;
@@ -47,13 +48,13 @@ public class ActionBarContentFragment extends ActionBarFragment {
             }
             mProgressContainer = root.findViewById(R.id.progressContainer);
             mContentContainer = root.findViewById(R.id.listContainer);
-            View rawContentView = root.findViewById(android.R.id.content);
-            if (rawContentView == null) {
+            mContentView = root.findViewById(android.R.id.content);
+            if (mContentView == null) {
                 throw new RuntimeException(
                         "Your content must have a FrameLayout whose id attribute is "
                                 + "'android.R.id.content'");
             }
-            mContent = (FrameLayout) rawContentView;
+            mContent = (FrameLayout) mContentView;
             if (mEmptyView != null) {
                 //mContent.setEmptyView(mEmptyView);
             } else if (mEmptyText != null) {
@@ -138,6 +139,8 @@ public class ActionBarContentFragment extends ActionBarFragment {
             }
             mProgressContainer.setVisibility(View.GONE);
             mContentContainer.setVisibility(View.VISIBLE);
+            mContentView.setVisibility(View.VISIBLE);
+            mStandardEmptyView.setVisibility(View.GONE);
         } else {
         	if(null != mStandardEmptyView){
         		mStandardEmptyView.setText("");
@@ -176,7 +179,7 @@ public class ActionBarContentFragment extends ActionBarFragment {
             mContentContainer.clearAnimation();
             mProgressContainer.setVisibility(View.GONE);
             mContentContainer.setVisibility(View.VISIBLE);
-            mContent.setVisibility(View.GONE);
+            mContentView.setVisibility(View.GONE);
             mStandardEmptyView.setVisibility(View.VISIBLE);
         } else {
         	if(null != mStandardEmptyView){
