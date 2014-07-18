@@ -1,0 +1,2 @@
+include ':ActionBarCompat'
+project(':ActionBarCompat').projectDir = new File(rootDir, '../ActionBarCompat')

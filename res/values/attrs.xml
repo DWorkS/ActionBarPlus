@@ -5,24 +5,27 @@
         <attr name="panningDurationInMs" format="integer" />
     </declare-styleable>
     <declare-styleable name="CircularImageView">
+        <attr name="circularImageViewStyle" format="reference"></attr>
         <attr name="border" format="boolean"></attr>
         <attr name="border_width" format="integer"></attr>
         <attr name="border_color" format="color"></attr>
         <attr name="shadow" format="boolean"></attr>
     </declare-styleable>
-    <declare-styleable name="Theme">
+<!--    <declare-styleable name="ThemePlus">
         <attr name="circularImageViewStyle" format="reference"></attr>
-    </declare-styleable>
+    </declare-styleable>-->
     <attr name="textSize" format="dimension" />
+
     <declare-styleable name="FloatLabelEditText">
-        <attr name="hint" format="string"/>
-        <attr name="text" format="string"/>
-        <attr name="textSize"/>
-        <attr name="textColorHintFocused" format="color"/>
-        <attr name="textColorHintUnFocused" format="color"/>
+        <attr name="hint" format="string" />
+        <attr name="text" format="string" />
+        <attr name="textSize" />
+        <attr name="textColorHintFocused" format="color" />
+        <attr name="textColorHintUnFocused" format="color" />
         <attr name="fitScreenWidth" format="enum">
-            <enum name="full" value="1"/>
-            <enum name="half" value="2"/>
+            <enum name="full" value="1" />
+            <enum name="half" value="2" />
         </attr>
     </declare-styleable>
+
 </resources>
