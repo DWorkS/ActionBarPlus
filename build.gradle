@@ -13,6 +13,7 @@ dependencies {
     compile project(':ActionBarCompat')
     compile files('libs/nineoldandroids-2.4.0.jar')
     compile 'com.android.support:support-v4:19+'
+    //compile 'com.android.support:recyclerview-v7:+'
 }
 android {
     compileSdkVersion 19
