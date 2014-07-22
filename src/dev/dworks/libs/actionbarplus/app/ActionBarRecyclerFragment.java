@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ItemAnimator;
 import android.support.v7.widget.RecyclerView.LayoutManager;
-import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import dev.dworks.libs.actionbarplus.ActionBarFragment;
 import dev.dworks.libs.actionbarplus.R;
 
 public class ActionBarRecyclerFragment extends ActionBarFragment {
-	private Adapter<ViewHolder> mAdapter;
+	private Adapter<RecyclerViewHolder> mAdapter;
 	private LayoutManager mLayoutManager;
     private CharSequence mEmptyText;
     private View mEmptyView;
@@ -26,13 +25,19 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
     private RecyclerView mList;
     private View mListContainer;
     private boolean mListShown;
-/*    final private AdapterView.OnItemClickListener mOnClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View v, int position,
-                long id) {
-            onListItemClick((ListView) parent, v, position, id);
+
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    	private RecyclerViewHolder(View itemView) {
+            super(itemView);
+            itemView.setOnClickListener(this);
         }
-    };*/
+
+        @Override
+        public void onClick(View view) {
+        	onListItemClick(view, getPosition(), getItemId());
+        }
+    }
     private View mProgressContainer;
     final private Runnable mRequestFocus = new Runnable() {
         @Override
@@ -81,16 +86,6 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
 		                                + "that is not a ListView class");
 				}
             }
-            /*if (!(rawListView instanceof ListView)) {
-                if (rawListView == null) {
-                    throw new RuntimeException(
-                            "Your content must have a ListView whose id attribute is "
-                                    + "'android.R.id.list'");
-                }
-                throw new RuntimeException(
-                        "Content has view with id attribute 'android.R.id.list' "
-                                + "that is not a ListView class");
-            }*/
             mList = (RecyclerView) rawListView;
 
             if (mEmptyView != null) {
@@ -104,9 +99,8 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
         mList.setLayoutManager(mLayoutManager);
         mList.setItemAnimator(mItemAnimator);
         mList.setHasFixedSize(true);
-        //mList.setOnItemClickListener(mOnClickListener);
         if (mAdapter != null) {
-            Adapter<ViewHolder> adapter = mAdapter;
+            Adapter<RecyclerViewHolder> adapter = mAdapter;
             mAdapter = null;
             setListAdapter(adapter);
         } else {
@@ -121,7 +115,7 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
         return mEmptyView;
     }
 
-    public Adapter<ViewHolder> getListAdapter() {
+    public Adapter<RecyclerViewHolder> getListAdapter() {
         return mAdapter;
     }
 
@@ -158,7 +152,7 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
         super.onDestroyView();
     }
 
-    public void onListItemClick(RecyclerView l, View v, int position, long id) {
+    public void onListItemClick(View v, int position, long id) {
     }
     
     @Override
@@ -210,7 +204,7 @@ public class ActionBarRecyclerFragment extends ActionBarFragment {
         }
     }
 
-    public void setListAdapter(Adapter<ViewHolder> adapter) {
+    public void setListAdapter(Adapter<RecyclerViewHolder> adapter) {
         boolean hadAdapter = mAdapter != null;
         mAdapter = adapter;
         if (mList != null) {

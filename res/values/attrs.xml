@@ -11,9 +11,11 @@
         <attr name="border_color" format="color"></attr>
         <attr name="shadow" format="boolean"></attr>
     </declare-styleable>
-<!--    <declare-styleable name="ThemePlus">
+    <!--
+        <declare-styleable name="ThemePlus">
         <attr name="circularImageViewStyle" format="reference"></attr>
-    </declare-styleable>-->
+    </declare-styleable>
+    -->
     <attr name="textSize" format="dimension" />
 
     <declare-styleable name="FloatLabelEditText">
@@ -26,6 +28,9 @@
             <enum name="full" value="1" />
             <enum name="half" value="2" />
         </attr>
+    </declare-styleable>
+    <declare-styleable name="SpinnerHolo">
+        <attr name="android:entries" />
     </declare-styleable>
 
 </resources>
