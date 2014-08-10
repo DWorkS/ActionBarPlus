@@ -15,7 +15,7 @@
 		<item name="android:backgroundDimAmount">0.6</item>
 		<item name="android:colorBackgroundCacheHint">@null</item>
 
-        <item name="sdlTitleTextStyle">@style/SDL.TextView.Title</item>
+		<item name="sdlTitleTextStyle">@style/SDL.TextView.Title</item>
         <item name="sdlMessageTextStyle">@style/SDL.TextView.Message</item>
 
 		<item name="sdlDialogStyle">@style/DialogStyleDark</item>
@@ -23,6 +23,7 @@
 
 	<style name="DialogStyleDark">
 		<item name="dialogBackground">@drawable/sdl_background_dark</item>
+		<item name="showDivider">true</item>
 		<item name="titleTextColor">@color/sdl_title_text_dark</item>
 		<item name="titleSeparatorColor">@color/sdl_title_separator_dark</item>
 		<item name="messageTextColor">@color/sdl_message_text_dark</item>
@@ -35,6 +36,7 @@
 
 	<style name="DialogStyleLight">
 		<item name="dialogBackground">@drawable/sdl_background_light</item>
+		<item name="showDivider">true</item>
 		<item name="titleTextColor">@color/sdl_title_text_light</item>
 		<item name="titleSeparatorColor">@color/sdl_title_separator_light</item>
 		<item name="messageTextColor">@color/sdl_message_text_light</item>
@@ -140,6 +142,7 @@
 		<item name="android:paddingRight">@dimen/grid_4</item>
 		<item name="android:paddingTop">@dimen/grid_4</item>
 		<item name="android:paddingBottom">@dimen/grid_4</item>
+		<item name="android:minWidth">400dp</item>
 	</style>
 
 	<style name="SDL.Progress" parent="@android:style/Widget.ProgressBar">

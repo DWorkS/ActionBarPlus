@@ -154,6 +154,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
 		private int mButtonBackgroundColorNormal;
 		private int mButtonBackgroundColorPressed;
 		private int mButtonBackgroundColorFocused;
+		private boolean mShowDivider;
 
 		public Builder(DialogFragment dialogFragment, Context context, LayoutInflater inflater, ViewGroup container) {
 			this.mDialogFragment = dialogFragment;
@@ -277,6 +278,8 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
 			final TypedArray a = mContext.getTheme().obtainStyledAttributes(null, R.styleable.DialogStyle, R.attr.sdlDialogStyle, 0);
 			mTitleTextColor = a.getColor(R.styleable.DialogStyle_titleTextColor, defaultTitleTextColor);
+			mShowDivider = a.getBoolean(R.styleable.DialogStyle_showDivider, true);
+			
 			mTitleSeparatorColor = a.getColor(R.styleable.DialogStyle_titleSeparatorColor, defaultTitleSeparatorColor);
 			mMessageTextColor = a.getColor(R.styleable.DialogStyle_messageTextColor, defaultMessageTextColor);
 			mButtonTextColor = a.getColorStateList(R.styleable.DialogStyle_buttonTextColor);
@@ -338,6 +341,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
 					tvTitle.setCompoundDrawablePadding(mContext.getResources().getDimensionPixelSize(R.dimen.grid_2));
 				}
 				viewTitleDivider.setBackgroundDrawable(new ColorDrawable(mTitleSeparatorColor));
+				viewTitleDivider.setVisibility(mShowDivider ? View.VISIBLE : View.GONE);
 			} else {
 				tvTitle.setVisibility(View.GONE);
 				viewTitleDivider.setVisibility(View.GONE);
