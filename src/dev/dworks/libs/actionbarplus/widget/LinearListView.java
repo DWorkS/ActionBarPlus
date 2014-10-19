@@ -3,20 +3,19 @@ package dev.dworks.libs.actionbarplus.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
-import android.support.v7.internal.widget.LinearLayoutICS;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
-import dev.dworks.libs.actionbarplus.R;
 
 /**
  * An extension of a linear layout that supports the divider API of Android
  * 4.0+. You can populate this layout with data that comes from a
  * {@link android.widget.ListAdapter}
  */
-public class LinearListView extends LinearLayoutICS {
+public class LinearListView extends LinearLayoutCompat {
 
 	private static final int[] R_styleable_LinearListView = new int[] {
 		/* 0 */android.R.attr.entries,

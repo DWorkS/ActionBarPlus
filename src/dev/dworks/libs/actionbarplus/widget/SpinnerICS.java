@@ -24,7 +24,7 @@ import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.v7.internal.widget.ListPopupWindow;
+import android.support.v7.widget.ListPopupWindow;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -691,7 +691,7 @@ public class SpinnerICS extends AbsSpinnerICS implements OnClickListener {
         }
     }
 
-    private class DropdownPopup extends android.support.v7.internal.widget.ListPopupWindow
+    private class DropdownPopup extends android.support.v7.widget.ListPopupWindow
             implements SpinnerPopup {
         private CharSequence mHintText;
         private ListAdapter mAdapter;
@@ -741,7 +741,7 @@ public class SpinnerICS extends AbsSpinnerICS implements OnClickListener {
                 setContentWidth(Math.max(
                         measureContentWidth((SpinnerAdapter) mAdapter, getBackground()),
                         spinnerWidth - spinnerPaddingLeft - spinnerPaddingRight));
-            } else if (mDropDownWidth == FILL_PARENT) {
+            } else if (mDropDownWidth == ViewGroup.LayoutParams.FILL_PARENT) {
                 final int spinnerWidth = SpinnerICS.this.getWidth();
                 final int spinnerPaddingRight = SpinnerICS.this.getPaddingRight();
                 setContentWidth(spinnerWidth - spinnerPaddingLeft - spinnerPaddingRight);
