@@ -3,6 +3,22 @@ ActionBarPlus
 
 Library Project improvements to ActionBarCompat.
 
+## Quick Start
+
+Volley is available as an AAR, so you just need to add the following dependency to your `build.gradle`.
+```
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+...
+
+dependencies {
+     compile 'dev.dworks.libs:actionbarplus:+'
+}
+...
+```
 
 Developed By
 ============
